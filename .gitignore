@@ -1,0 +1,9 @@
+cursor-sandbox-apparmor.deb
+.DS_Store
+node_modules/
+dist/
+.cursor/
+.vercel/
+.env
+*.log
+
