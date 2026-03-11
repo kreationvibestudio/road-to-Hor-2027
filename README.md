@@ -2,6 +2,8 @@
 
 Campaign site for **House of Representatives 2027**, **Esan North East & Esan South East Federal Constituency**, under the **ADC (African Democratic Congress)**.
 
+**Live site:** [road-to-hor-2027.vercel.app](https://road-to-hor-2027.vercel.app)
+
 ## Message
 
 - Putting **humanity** back in politics  
