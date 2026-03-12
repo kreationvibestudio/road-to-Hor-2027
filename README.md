@@ -56,3 +56,11 @@ You can host this as static files on:
 - Any web host that serves HTML/CSS/JS.
 
 No build step required; upload the project folder as-is.
+
+## Supabase
+
+If you see **Invalid time zone specified: Etc/Unknown**:
+
+1. Open [Supabase Dashboard](https://supabase.com/dashboard) → your project → **SQL Editor**.
+2. Run the script in `supabase/timezone-fix.sql` (sets the database timezone to `UTC`).
+3. Reconnect or refresh; new connections will use the correct timezone.
