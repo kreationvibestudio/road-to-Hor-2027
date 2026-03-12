@@ -76,6 +76,24 @@
     .project-update { border-left: 3px solid var(--color-green); padding-left: 0.6rem; margin-bottom: 0.6rem; font-size: 0.9rem; }
     .project-update time { font-size: 0.8rem; color: var(--color-text-muted); display: block; }
     .project-update strong { display: block; }
+    .project-detail-status-wrap { display: flex; align-items: center; gap: 0.5rem; margin-top: 0.25rem; }
+    .project-detail-status-wrap select { padding: 0.35rem 0.5rem; border-radius: 6px; border: 1px solid var(--color-border); font-size: 0.9rem; }
+    .project-detail-show-on-site-wrap { margin-top: 0.5rem; font-size: 0.9rem; }
+    .project-detail-show-on-site-wrap label { display: flex; align-items: center; gap: 0.5rem; cursor: pointer; }
+    .project-detail-show-on-site-wrap input[type="checkbox"] { width: auto; }
+    .project-detail-note-form { margin-top: 1rem; padding: 1rem; background: var(--color-green-muted); border-radius: 8px; }
+    .project-detail-note-form label { display: block; font-weight: 600; font-size: 0.85rem; margin-bottom: 0.25rem; }
+    .project-detail-note-form input, .project-detail-note-form select, .project-detail-note-form textarea { width: 100%; padding: 0.5rem; border: 1px solid var(--color-border); border-radius: 6px; font-size: 0.9rem; margin-bottom: 0.5rem; }
+    .project-detail-note-form textarea { min-height: 3rem; resize: vertical; }
+    .project-detail-note-form .btn { margin-top: 0.25rem; }
+    .project-detail-attachments { margin-top: 1rem; }
+    .project-detail-attachments h3 { font-size: 0.95rem; margin-bottom: 0.4rem; color: var(--color-text); }
+    .project-detail-attachments ul { list-style: none; padding: 0; margin: 0 0 0.5rem 0; }
+    .project-detail-attachments li { display: flex; align-items: center; gap: 0.5rem; padding: 0.35rem 0; border-bottom: 1px solid var(--color-border); font-size: 0.9rem; }
+    .project-detail-attachments li a { color: var(--color-green); }
+    .project-detail-attachments .attachment-thumb { width: 36px; height: 36px; object-fit: cover; border-radius: 4px; }
+    .project-detail-attachments .upload-btn-wrap { margin-top: 0.5rem; }
+    .project-detail-attachments .upload-status { font-size: 0.85rem; color: var(--color-text-muted); margin-top: 0.25rem; }
     .admin-filters--row { align-items: center; }
     .admin-filters--row .btn { margin-left: auto; }
     .add-project-panel { max-width: 36rem; }
@@ -87,6 +105,8 @@
     .add-project-grid label { grid-column: 1 / -1; }
     .add-project-grid input, .add-project-grid select, .add-project-grid textarea { grid-column: 1 / -1; margin-bottom: 0.5rem; }
     .add-project-full { grid-column: 1 / -1; }
+    .add-project-show-on-site { display: flex; align-items: center; gap: 0.5rem; cursor: pointer; }
+    .add-project-show-on-site input { width: auto; }
     .add-project-msg { font-size: 0.9rem; margin: 0.5rem 0; min-height: 1.2rem; }
     .add-project-msg.err { color: var(--color-accent); }
     .add-project-msg.ok { color: var(--color-green); }
@@ -205,12 +225,54 @@
           <div class="project-detail-header">
             <div>
               <div class="project-detail-title" id="project-detail-title"></div>
-              <div id="project-detail-status" style="font-size:0.85rem;color:var(--color-text-muted);"></div>
+              <div class="project-detail-status-wrap">
+                <label for="project-detail-status-select">Status</label>
+                <select id="project-detail-status-select" aria-label="Project status">
+                  <option value="planned">Planned</option>
+                  <option value="in_progress">In progress</option>
+                  <option value="completed">Completed</option>
+                  <option value="on_hold">On hold</option>
+                </select>
+              </div>
+              <div class="project-detail-show-on-site-wrap">
+                <label>
+                  <input type="checkbox" id="project-detail-show-on-site" aria-label="Show on public site">
+                  Show on Funds &amp; transparency (when status is In progress or Completed)
+                </label>
+              </div>
             </div>
             <button type="button" class="project-detail-close" id="project-detail-close" aria-label="Close project details">×</button>
           </div>
           <dl class="project-detail-meta" id="project-detail-meta"></dl>
           <div class="project-detail-updates" id="project-detail-updates"></div>
+          <div class="project-detail-note-form">
+            <h3 style="margin-top:0;margin-bottom:0.5rem;">Add note / update</h3>
+            <form id="project-detail-note-form">
+              <label for="note-summary">Summary <span class="required">*</span></label>
+              <input type="text" id="note-summary" name="summary" required placeholder="e.g. Site inspection completed" autocomplete="off">
+              <label for="note-details">Details</label>
+              <textarea id="note-details" name="details" rows="2" placeholder="Optional details..."></textarea>
+              <label for="note-status">Update status (optional)</label>
+              <select id="note-status" name="status">
+                <option value="">— No change —</option>
+                <option value="planned">Planned</option>
+                <option value="in_progress">In progress</option>
+                <option value="completed">Completed</option>
+                <option value="on_hold">On hold</option>
+              </select>
+              <label for="note-progress">Progress % (optional)</label>
+              <input type="number" id="note-progress" name="progress_percent" min="0" max="100" placeholder="e.g. 50">
+              <button type="submit" class="btn btn-primary">Add note</button>
+            </form>
+          </div>
+          <div class="project-detail-attachments">
+            <h3>Documents &amp; images</h3>
+            <ul id="project-detail-attachments-list"></ul>
+            <div class="upload-btn-wrap">
+              <input type="file" id="project-detail-file-input" accept="image/*,.pdf,.doc,.docx,.xls,.xlsx" multiple aria-label="Upload file">
+              <p class="upload-status" id="project-detail-upload-status" aria-live="polite"></p>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -276,6 +338,10 @@
 
               <label for="add-project-summary" class="add-project-full">Summary / description</label>
               <textarea id="add-project-summary" name="summary" class="add-project-full" rows="4" placeholder="Brief description of the project and expected impact..."></textarea>
+              <label class="add-project-full add-project-show-on-site">
+                <input type="checkbox" id="add-project-show-on-site" name="show_on_site" value="1" checked>
+                Show on public site (Funds &amp; transparency) when status is In progress or Completed
+              </label>
             </div>
             <p class="add-project-msg" id="add-project-msg" aria-live="polite"></p>
             <div class="add-project-actions">
@@ -319,9 +385,16 @@
       var detailBackdrop = document.getElementById('project-detail-backdrop');
       var detailClose = document.getElementById('project-detail-close');
       var detailTitle = document.getElementById('project-detail-title');
-      var detailStatus = document.getElementById('project-detail-status');
+      var detailStatusSelect = document.getElementById('project-detail-status-select');
+      var detailShowOnSiteCheckbox = document.getElementById('project-detail-show-on-site');
       var detailMeta = document.getElementById('project-detail-meta');
       var detailUpdates = document.getElementById('project-detail-updates');
+      var detailNoteForm = document.getElementById('project-detail-note-form');
+      var detailAttachmentsList = document.getElementById('project-detail-attachments-list');
+      var detailFileInput = document.getElementById('project-detail-file-input');
+      var detailUploadStatus = document.getElementById('project-detail-upload-status');
+
+      var currentProjectId = null;
 
       var addProjectBackdrop = document.getElementById('add-project-backdrop');
       var addProjectClose = document.getElementById('add-project-close');
@@ -554,14 +627,20 @@
         });
       }
 
+      function refreshProjectDetail() {
+        if (currentProjectId) openProjectDetail(currentProjectId);
+      }
+
       function openProjectDetail(id) {
         if (!id) return;
+        currentProjectId = id;
         detailBackdrop.classList.add('project-detail-backdrop--open');
         detailBackdrop.setAttribute('aria-hidden', 'false');
         detailTitle.textContent = 'Loading...';
-        detailStatus.textContent = '';
+        if (detailStatusSelect) detailStatusSelect.value = 'planned';
         detailMeta.innerHTML = '';
         detailUpdates.innerHTML = '';
+        if (detailAttachmentsList) detailAttachmentsList.innerHTML = '';
 
         fetch(apiBase + '/api/admin-project-detail?id=' + encodeURIComponent(id), { credentials: 'include' })
           .then(function (r) {
@@ -571,7 +650,8 @@
           .then(function (payload) {
             var p = payload.project || {};
             detailTitle.textContent = p.title || 'Untitled project';
-            detailStatus.textContent = (p.status || 'planned').replace(/_/g, ' ');
+            if (detailStatusSelect) detailStatusSelect.value = p.status || 'planned';
+            if (detailShowOnSiteCheckbox) detailShowOnSiteCheckbox.checked = p.show_on_site !== false;
 
             var metaHtml = '';
             function addMeta(label, value) {
@@ -608,10 +688,139 @@
               });
               detailUpdates.innerHTML = html;
             }
+
+            var attachments = payload.attachments || [];
+            if (detailAttachmentsList) {
+              detailAttachmentsList.innerHTML = '';
+              if (!attachments.length) {
+                var empty = document.createElement('li');
+                empty.textContent = 'No documents or images yet. Use the file input below to add some.';
+                empty.style.color = 'var(--color-text-muted)';
+                detailAttachmentsList.appendChild(empty);
+              } else {
+                attachments.forEach(function (att) {
+                  var li = document.createElement('li');
+                  var link = document.createElement('a');
+                  link.href = apiBase + '/api/admin-project-attachment?id=' + encodeURIComponent(att.id);
+                  link.target = '_blank';
+                  link.rel = 'noopener';
+                  link.textContent = att.file_name || 'File';
+                  var isImage = (att.content_type || '').indexOf('image/') === 0;
+                  if (isImage) {
+                    var img = document.createElement('img');
+                    img.className = 'attachment-thumb';
+                    img.src = apiBase + '/api/admin-project-attachment?id=' + encodeURIComponent(att.id);
+                    img.alt = att.file_name || '';
+                    img.loading = 'lazy';
+                    li.appendChild(img);
+                  }
+                  li.appendChild(link);
+                  detailAttachmentsList.appendChild(li);
+                });
+              }
+            }
           })
           .catch(function () {
             detailTitle.textContent = 'Could not load project details';
           });
+      }
+
+      if (detailStatusSelect) {
+        detailStatusSelect.addEventListener('change', function () {
+          if (!currentProjectId) return;
+          var status = detailStatusSelect.value;
+          fetch(apiBase + '/api/admin-project-patch?id=' + encodeURIComponent(currentProjectId), {
+            method: 'PATCH',
+            credentials: 'include',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ status: status })
+          }).then(function (r) {
+            if (r.ok) loadData();
+          }).catch(function () {});
+        });
+      }
+
+      if (detailShowOnSiteCheckbox) {
+        detailShowOnSiteCheckbox.addEventListener('change', function () {
+          if (!currentProjectId) return;
+          var showOnSite = detailShowOnSiteCheckbox.checked;
+          fetch(apiBase + '/api/admin-project-patch?id=' + encodeURIComponent(currentProjectId), {
+            method: 'PATCH',
+            credentials: 'include',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ show_on_site: showOnSite })
+          }).then(function (r) {
+            if (r.ok) loadData();
+          }).catch(function () {});
+        });
+      }
+
+      if (detailNoteForm) {
+        detailNoteForm.addEventListener('submit', function (e) {
+          e.preventDefault();
+          if (!currentProjectId) return;
+          var fd = new FormData(detailNoteForm);
+          var body = {
+            project_id: currentProjectId,
+            summary: (fd.get('summary') || '').trim(),
+            details: (fd.get('details') || '').trim() || null,
+            status: (fd.get('status') || '').trim() || null,
+            progress_percent: fd.get('progress_percent') ? Number(fd.get('progress_percent')) : null
+          };
+          if (!body.summary) return;
+          fetch(apiBase + '/api/admin-project-update', {
+            method: 'POST',
+            credentials: 'include',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body)
+          }).then(function (r) {
+            if (r.ok) {
+              detailNoteForm.reset();
+              refreshProjectDetail();
+              loadData();
+            }
+          }).catch(function () {});
+        });
+      }
+
+      if (detailFileInput) {
+        detailFileInput.addEventListener('change', function () {
+          if (!currentProjectId || !this.files || !this.files.length) return;
+          var files = Array.prototype.slice.call(this.files);
+          if (detailUploadStatus) detailUploadStatus.textContent = 'Uploading ' + files.length + ' file(s)...';
+          var done = 0;
+          var errs = 0;
+          function checkDone() {
+            done++;
+            if (done === files.length) {
+              if (detailUploadStatus) detailUploadStatus.textContent = errs ? 'Some uploads failed.' : 'Done.';
+              refreshProjectDetail();
+              loadData();
+              detailFileInput.value = '';
+            }
+          }
+          files.forEach(function (file) {
+            var reader = new FileReader();
+            reader.onload = function () {
+              var base64 = (reader.result || '').split(',')[1] || '';
+              fetch(apiBase + '/api/admin-project-upload', {
+                method: 'POST',
+                credentials: 'include',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  project_id: currentProjectId,
+                  file_name: file.name,
+                  content_type: file.type || 'application/octet-stream',
+                  content_base64: base64
+                })
+              }).then(function (r) {
+                if (!r.ok) errs++;
+                checkDone();
+              }).catch(function () { errs++; checkDone(); });
+            };
+            reader.readAsDataURL(file);
+          });
+        });
       }
 
       function closeProjectDetail() {
@@ -647,6 +856,7 @@
         addProjectMsg.classList.remove('err', 'ok');
 
         var fd = new FormData(addProjectForm);
+        var addShowOnSiteEl = document.getElementById('add-project-show-on-site');
         var body = {
           title: (fd.get('title') || '').trim(),
           community: (fd.get('community') || '').trim(),
@@ -659,7 +869,8 @@
           start_date: (fd.get('start_date') || '').trim() || null,
           expected_end_date: (fd.get('expected_end_date') || '').trim() || null,
           next_milestone_date: (fd.get('next_milestone_date') || '').trim() || null,
-          summary: (fd.get('summary') || '').trim() || null
+          summary: (fd.get('summary') || '').trim() || null,
+          show_on_site: addShowOnSiteEl ? addShowOnSiteEl.checked : true
         };
         if (!body.title) {
           addProjectMsg.textContent = 'Please enter a project title.';

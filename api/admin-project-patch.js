@@ -26,17 +26,24 @@ function verifyCookie(cookieValue, secret) {
   return true;
 }
 
+const ALLOWED_KEYS = [
+  'status', 'title', 'community', 'ward', 'category',
+  'allocation_amount', 'allocation_currency', 'allocation_year',
+  'start_date', 'expected_end_date', 'actual_end_date', 'next_milestone_date',
+  'summary', 'show_on_site'
+];
+
 module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', req.headers.origin || '*');
   res.setHeader('Access-Control-Allow-Credentials', 'true');
-  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Methods', 'PATCH, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
   if (req.method === 'OPTIONS') {
     return res.status(204).end();
   }
 
-  if (req.method !== 'POST') {
+  if (req.method !== 'PATCH') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
@@ -53,34 +60,40 @@ module.exports = async function handler(req, res) {
     return res.status(401).json({ error: 'Unauthorized' });
   }
 
-  const body = typeof req.body === 'string' ? JSON.parse(req.body || '{}') : (req.body || {});
-  const title = (body.title || '').trim();
-  if (!title) {
-    return res.status(400).json({ error: 'Title is required' });
+  const id = (req.query && req.query.id) || (req.url.split('?')[1] || '').split('id=')[1];
+  if (!id) {
+    return res.status(400).json({ error: 'Missing project id' });
   }
 
-  const row = {
-    title,
-    community: (body.community || '').trim() || null,
-    ward: (body.ward || '').trim() || null,
-    category: (body.category || '').trim() || null,
-    status: (body.status || 'planned').trim() || 'planned',
-    allocation_amount: body.allocation_amount != null && body.allocation_amount !== '' ? Number(body.allocation_amount) : null,
-    allocation_currency: (body.allocation_currency || 'NGN').trim() || 'NGN',
-    allocation_year: body.allocation_year != null && body.allocation_year !== '' ? Number(body.allocation_year) : null,
-    start_date: (body.start_date || '').trim() || null,
-    expected_end_date: (body.expected_end_date || '').trim() || null,
-    next_milestone_date: (body.next_milestone_date || '').trim() || null,
-    summary: (body.summary || '').trim() || null,
-    show_on_site: body.show_on_site !== false && body.show_on_site !== 'false'
-  };
+  const body = typeof req.body === 'string' ? JSON.parse(req.body || '{}') : (req.body || {});
+  const updates = {};
+  ALLOWED_KEYS.forEach(function (key) {
+    if (body[key] !== undefined) {
+      if (key === 'allocation_amount' || key === 'allocation_year') {
+        updates[key] = body[key] === '' || body[key] == null ? null : Number(body[key]);
+      } else if (key === 'show_on_site') {
+        updates[key] = Boolean(body[key]);
+      } else {
+        updates[key] = typeof body[key] === 'string' ? body[key].trim() || null : body[key];
+      }
+    }
+  });
+  if (Object.keys(updates).length === 0) {
+    return res.status(400).json({ error: 'No valid fields to update' });
+  }
+  updates.last_updated = new Date().toISOString();
 
   const supabase = createClient(url, serviceKey);
-  const { data, error } = await supabase.from('projects').insert(row).select().single();
+  const { data, error } = await supabase
+    .from('projects')
+    .update(updates)
+    .eq('id', id)
+    .select()
+    .single();
 
   if (error) {
     return res.status(500).json({ error: error.message });
   }
 
-  return res.status(201).json(data);
+  return res.status(200).json(data);
 };

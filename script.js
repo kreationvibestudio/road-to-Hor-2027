@@ -115,4 +115,33 @@
       });
     });
   }
+
+  // Funds & transparency: load projects that have started and are shown on site
+  var fundsTbody = document.getElementById('funds-tbody');
+  if (fundsTbody) {
+    var apiOrigin = typeof window.location !== 'undefined' && window.location.origin ? window.location.origin : '';
+    fetch(apiOrigin + '/api/public-projects')
+      .then(function (r) { return r.ok ? r.json() : Promise.reject(); })
+      .then(function (data) {
+        var projects = (data && data.projects) || [];
+        if (!projects.length) return;
+        fundsTbody.innerHTML = '';
+        projects.forEach(function (p) {
+          var year = p.allocation_year != null ? String(p.allocation_year) : '—';
+          var raw = (p.title || '—');
+          var title = raw.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+          var amount = '—';
+          if (p.allocation_amount != null) {
+            var curr = p.allocation_currency || 'NGN';
+            amount = curr + ' ' + Number(p.allocation_amount).toLocaleString();
+          }
+          var status = (p.status || '').replace(/_/g, ' ');
+          status = status ? status.charAt(0).toUpperCase() + status.slice(1) : '—';
+          var tr = document.createElement('tr');
+          tr.innerHTML = '<td>' + year + '</td><td>' + title + '</td><td>' + amount + '</td><td>' + status + '</td>';
+          fundsTbody.appendChild(tr);
+        });
+      })
+      .catch(function () {});
+  }
 })();

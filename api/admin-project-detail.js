@@ -80,6 +80,18 @@ module.exports = async function handler(req, res) {
     return res.status(500).json({ error: updErr.message });
   }
 
-  return res.status(200).json({ project, updates: updates || [] });
+  let attachments = [];
+  const { data: attData, error: attErr } = await supabase
+    .from('project_attachments')
+    .select('*')
+    .eq('project_id', id)
+    .order('created_at', { ascending: false });
+  if (!attErr && attData) attachments = attData;
+
+  return res.status(200).json({
+    project,
+    updates: updates || [],
+    attachments
+  });
 };
 

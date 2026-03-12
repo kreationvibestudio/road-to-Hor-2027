@@ -3,6 +3,8 @@ const { createClient } = require('@supabase/supabase-js');
 
 const COOKIE_NAME = 'admin_session';
 const MAX_AGE = 86400;
+const BUCKET = 'project-attachments';
+const SIGNED_URL_EXPIRY = 3600; // 1 hour
 
 function sign(value, secret) {
   return crypto.createHmac('sha256', secret).update(String(value)).digest('hex');
@@ -29,14 +31,14 @@ function verifyCookie(cookieValue, secret) {
 module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', req.headers.origin || '*');
   res.setHeader('Access-Control-Allow-Credentials', 'true');
-  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
   if (req.method === 'OPTIONS') {
     return res.status(204).end();
   }
 
-  if (req.method !== 'POST') {
+  if (req.method !== 'GET') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
@@ -53,34 +55,29 @@ module.exports = async function handler(req, res) {
     return res.status(401).json({ error: 'Unauthorized' });
   }
 
-  const body = typeof req.body === 'string' ? JSON.parse(req.body || '{}') : (req.body || {});
-  const title = (body.title || '').trim();
-  if (!title) {
-    return res.status(400).json({ error: 'Title is required' });
+  const id = (req.query && req.query.id) || (req.url.split('?')[1] || '').split('id=')[1];
+  if (!id) {
+    return res.status(400).json({ error: 'Missing attachment id' });
   }
-
-  const row = {
-    title,
-    community: (body.community || '').trim() || null,
-    ward: (body.ward || '').trim() || null,
-    category: (body.category || '').trim() || null,
-    status: (body.status || 'planned').trim() || 'planned',
-    allocation_amount: body.allocation_amount != null && body.allocation_amount !== '' ? Number(body.allocation_amount) : null,
-    allocation_currency: (body.allocation_currency || 'NGN').trim() || 'NGN',
-    allocation_year: body.allocation_year != null && body.allocation_year !== '' ? Number(body.allocation_year) : null,
-    start_date: (body.start_date || '').trim() || null,
-    expected_end_date: (body.expected_end_date || '').trim() || null,
-    next_milestone_date: (body.next_milestone_date || '').trim() || null,
-    summary: (body.summary || '').trim() || null,
-    show_on_site: body.show_on_site !== false && body.show_on_site !== 'false'
-  };
 
   const supabase = createClient(url, serviceKey);
-  const { data, error } = await supabase.from('projects').insert(row).select().single();
+  const { data: att, error: fetchErr } = await supabase
+    .from('project_attachments')
+    .select('*')
+    .eq('id', id)
+    .single();
 
-  if (error) {
-    return res.status(500).json({ error: error.message });
+  if (fetchErr || !att) {
+    return res.status(404).json({ error: 'Attachment not found' });
   }
 
-  return res.status(201).json(data);
+  const { data: signed, error: signErr } = await supabase.storage
+    .from(BUCKET)
+    .createSignedUrl(att.storage_path, SIGNED_URL_EXPIRY);
+
+  if (signErr || !signed || !signed.signedUrl) {
+    return res.status(500).json({ error: 'Could not generate download URL' });
+  }
+
+  return res.redirect(302, signed.signedUrl);
 };

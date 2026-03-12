@@ -74,7 +74,12 @@ The **Admin** link in the footer goes to a password-protected page where you can
 - Login uses **server-side auth**: you enter the password on the site; the server checks it and sets a secure **HttpOnly cookie** (no password is stored in the browser).
 - Requests are loaded via an **API** that uses your Supabase **service role** key, so the list is not exposed to the public.
 - **Add project**: On the Projects (Kanban) tab, use **Add project** to create a new constituency project. Fields include title, community, ward, category (e.g. Roads & transport, Water, Education, Healthcare), status, allocation amount/year, dates, and summary. New projects appear on the Kanban board after saving.
+- **Work on a project**: Click a project card to open its detail. There you can: change **Status** (Planned / In progress / Completed / On hold); **Show on public site** (toggle whether the project appears in **Funds and transparency** on the main site when status is In progress or Completed); **Add notes/updates**; **Upload documents and images** (max 4MB per file). Attachments open in a new tab for viewing or download.
 - Session lasts **24 hours**; use **Log out** to end it early.
+
+**Funds and transparency:** The public site’s “Funds and transparency” section lists projects that have **started** (status In progress or Completed) and have **Show on public site** enabled. Run `supabase/projects-show-on-site.sql` in the Supabase SQL Editor to add the `show_on_site` column to `projects`.
+
+**Attachments (documents & images):** Run `supabase/project-attachments-schema.sql` in the Supabase SQL Editor, then in Dashboard → **Storage** create a bucket named `project-attachments` (private). The admin upload and view links will then work.
 
 ### Vercel environment variables
 

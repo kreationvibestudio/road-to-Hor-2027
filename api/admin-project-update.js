@@ -54,29 +54,23 @@ module.exports = async function handler(req, res) {
   }
 
   const body = typeof req.body === 'string' ? JSON.parse(req.body || '{}') : (req.body || {});
-  const title = (body.title || '').trim();
-  if (!title) {
-    return res.status(400).json({ error: 'Title is required' });
+  const projectId = (body.project_id || '').trim();
+  const summary = (body.summary || '').trim();
+  if (!projectId || !summary) {
+    return res.status(400).json({ error: 'project_id and summary are required' });
   }
 
   const row = {
-    title,
-    community: (body.community || '').trim() || null,
-    ward: (body.ward || '').trim() || null,
-    category: (body.category || '').trim() || null,
-    status: (body.status || 'planned').trim() || 'planned',
-    allocation_amount: body.allocation_amount != null && body.allocation_amount !== '' ? Number(body.allocation_amount) : null,
-    allocation_currency: (body.allocation_currency || 'NGN').trim() || 'NGN',
-    allocation_year: body.allocation_year != null && body.allocation_year !== '' ? Number(body.allocation_year) : null,
-    start_date: (body.start_date || '').trim() || null,
-    expected_end_date: (body.expected_end_date || '').trim() || null,
-    next_milestone_date: (body.next_milestone_date || '').trim() || null,
-    summary: (body.summary || '').trim() || null,
-    show_on_site: body.show_on_site !== false && body.show_on_site !== 'false'
+    project_id: projectId,
+    summary,
+    details: (body.details || '').trim() || null,
+    status: (body.status || '').trim() || null,
+    progress_percent: body.progress_percent != null && body.progress_percent !== '' ? Number(body.progress_percent) : null,
+    created_by: (body.created_by || '').trim() || null
   };
 
   const supabase = createClient(url, serviceKey);
-  const { data, error } = await supabase.from('projects').insert(row).select().single();
+  const { data, error } = await supabase.from('project_updates').insert(row).select().single();
 
   if (error) {
     return res.status(500).json({ error: error.message });
