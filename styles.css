@@ -307,6 +307,17 @@ body {
   color: var(--color-white);
 }
 
+.btn-outline {
+  background: transparent;
+  color: var(--color-green);
+  border: 2px solid var(--color-green);
+}
+.btn-outline:hover,
+.btn-outline:focus {
+  background: var(--color-green-muted);
+  color: var(--color-green);
+}
+
 /* Sections */
 .section {
   padding: var(--space-2xl) 0;
@@ -655,6 +666,16 @@ body {
   margin-top: var(--space-lg) !important;
   font-weight: 600;
   color: var(--color-green);
+}
+
+.manifesto-lang-toggle-wrap {
+  margin: var(--space-md) 0 0;
+}
+.manifesto-lang-btn {
+  font-size: 0.9375rem;
+}
+.manifesto-lang--hidden {
+  display: none !important;
 }
 
 /* Projects */

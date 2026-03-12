@@ -35,6 +35,33 @@
     });
   });
 
+  // Manifesto: toggle English / Esan
+  var manifestoLangBtn = document.getElementById('manifesto-lang-btn');
+  var manifestoEn = document.getElementById('manifesto-en');
+  var manifestoEsan = document.getElementById('manifesto-esan');
+  if (manifestoLangBtn && manifestoEn && manifestoEsan) {
+    manifestoLangBtn.addEventListener('click', function () {
+      var showEsan = manifestoEsan.classList.contains('manifesto-lang--hidden');
+      if (showEsan) {
+        manifestoEn.classList.add('manifesto-lang--hidden');
+        manifestoEn.setAttribute('aria-hidden', 'true');
+        manifestoEsan.classList.remove('manifesto-lang--hidden');
+        manifestoEsan.setAttribute('aria-hidden', 'false');
+        manifestoLangBtn.textContent = 'View in English';
+        manifestoLangBtn.setAttribute('aria-label', 'View manifesto in English');
+        manifestoLangBtn.setAttribute('aria-pressed', 'true');
+      } else {
+        manifestoEsan.classList.add('manifesto-lang--hidden');
+        manifestoEsan.setAttribute('aria-hidden', 'true');
+        manifestoEn.classList.remove('manifesto-lang--hidden');
+        manifestoEn.setAttribute('aria-hidden', 'false');
+        manifestoLangBtn.textContent = 'View in Esan';
+        manifestoLangBtn.setAttribute('aria-label', 'View manifesto in Esan');
+        manifestoLangBtn.setAttribute('aria-pressed', 'false');
+      }
+    });
+  }
+
   // Supabase: save constituency project requests
   var SUPABASE_URL = 'https://pwvqehmsjlapzaszckmw.supabase.co';
   var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB3dnFlaG1zamxhcHphc3pja213Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMyNDYwMjEsImV4cCI6MjA4ODgyMjAyMX0.BAE9f-zXB0PORYCzdy4Nvfqf1fvl-YPsEFsOAfIb-SA';
