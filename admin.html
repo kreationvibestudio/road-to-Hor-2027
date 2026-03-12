@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin — Constituency requests</title>
+  <title>Admin — Constituency dashboard</title>
   <link rel="stylesheet" href="styles.css">
   <style>
-    .admin-wrap { max-width: 64rem; margin: 0 auto; padding: 2rem 1.5rem; }
-    .admin-heading { font-family: var(--font-heading); color: var(--color-green); margin-bottom: 0.5rem; }
+    .admin-wrap { max-width: 72rem; margin: 0 auto; padding: 2rem 1.5rem; }
+    .admin-heading { font-family: var(--font-heading); color: var(--color-green); margin-bottom: 0.25rem; }
     .admin-sub { color: var(--color-text-muted); margin-bottom: 1.5rem; }
     .admin-gate { background: var(--color-white); padding: 2rem; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); max-width: 24rem; }
     .admin-gate label { display: block; font-weight: 600; margin-bottom: 0.5rem; }
@@ -15,22 +15,73 @@
     .admin-gate .btn { width: 100%; }
     .admin-gate .msg { font-size: 0.9rem; margin-top: 0.75rem; color: var(--color-text-muted); }
     .admin-gate .msg.err { color: var(--color-accent); }
-    .admin-table-wrap { overflow-x: auto; margin-top: 1rem; }
+    .admin-back { margin-bottom: 1rem; }
+    .admin-logout { margin-bottom: 1.5rem; }
+    .admin-summary { display: grid; gap: 1rem; margin-bottom: 1.5rem; }
+    @media (min-width: 640px) {
+      .admin-summary { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    }
+    @media (min-width: 960px) {
+      .admin-summary { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    }
+    .summary-card { background: var(--color-white); border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); padding: 1rem 1.2rem; border: 1px solid var(--color-border); }
+    .summary-label { font-size: 0.85rem; color: var(--color-text-muted); margin-bottom: 0.35rem; text-transform: uppercase; letter-spacing: 0.05em; }
+    .summary-value { font-family: var(--font-heading); font-size: 1.6rem; color: var(--color-green); }
+    .summary-note { font-size: 0.8rem; color: var(--color-text-muted); margin-top: 0.15rem; }
+    .admin-tabs { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1rem; border-bottom: 1px solid var(--color-border); padding-bottom: 0.5rem; }
+    .admin-tab { padding: 0.4rem 0.8rem; border-radius: 999px; border: none; background: transparent; cursor: pointer; font-size: 0.9rem; }
+    .admin-tab--active { background: var(--color-green-muted); color: var(--color-green); font-weight: 600; }
+    .admin-section { display: none; }
+    .admin-section--active { display: block; }
+    .admin-filters { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 0.75rem; align-items: center; }
+    .admin-filters label { font-size: 0.85rem; color: var(--color-text-muted); }
+    .admin-filters select, .admin-filters input[type="search"] { padding: 0.4rem 0.6rem; border-radius: 6px; border: 1px solid var(--color-border); font-size: 0.85rem; }
+    .admin-table-wrap { overflow-x: auto; margin-top: 0.5rem; }
     .admin-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
     .admin-table th, .admin-table td { padding: 0.6rem 0.75rem; text-align: left; border-bottom: 1px solid var(--color-border); }
     .admin-table th { background: var(--color-green-muted); font-weight: 600; color: var(--color-green); }
     .admin-table tr:hover td { background: rgba(0,0,0,0.02); }
-    .admin-table .details-cell { max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .admin-table .details-cell { max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .admin-table .details-cell:hover { white-space: normal; }
-    .admin-logout { margin-bottom: 1rem; }
     .admin-empty { color: var(--color-text-muted); padding: 2rem; text-align: center; }
-    .admin-back { margin-bottom: 1rem; }
+    /* Kanban */
+    .board { display: grid; gap: 1rem; margin-top: 0.5rem; }
+    @media (min-width: 768px) { .board { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+    .board-column { background: var(--color-green-muted); border-radius: 8px; padding: 0.6rem; display: flex; flex-direction: column; max-height: 70vh; }
+    .board-column-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem; }
+    .board-column-title { font-size: 0.9rem; font-weight: 600; color: var(--color-green); text-transform: uppercase; letter-spacing: 0.06em; }
+    .board-column-count { font-size: 0.8rem; color: var(--color-text-muted); }
+    .board-cards { overflow-y: auto; padding-right: 0.15rem; display: flex; flex-direction: column; gap: 0.5rem; }
+    .board-card { background: var(--color-white); border-radius: 8px; padding: 0.6rem 0.7rem; border: 1px solid var(--color-border); cursor: pointer; }
+    .board-card:hover { box-shadow: 0 2px 10px rgba(0,0,0,0.08); }
+    .board-card-title { font-size: 0.95rem; font-weight: 600; margin-bottom: 0.2rem; color: var(--color-text); }
+    .board-card-meta { font-size: 0.8rem; color: var(--color-text-muted); margin-bottom: 0.2rem; }
+    .board-card-tag { display: inline-block; padding: 0.1rem 0.5rem; border-radius: 999px; font-size: 0.75rem; margin-right: 0.25rem; }
+    .board-card-tag--community { background: rgba(13,92,46,0.08); color: var(--color-green); }
+    .board-card-tag--date { background: rgba(0,0,0,0.04); }
+    .board-card-amount { font-size: 0.85rem; color: var(--color-text); }
+    /* Project detail panel */
+    .project-detail-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.4); display: none; align-items: flex-start; justify-content: center; padding-top: 5vh; z-index: 1000; }
+    .project-detail-backdrop--open { display: flex; }
+    .project-detail { background: var(--color-white); width: min(48rem, 100% - 2rem); max-height: 90vh; border-radius: 10px; box-shadow: 0 10px 40px rgba(0,0,0,0.25); padding: 1.5rem 1.75rem; overflow-y: auto; }
+    .project-detail-header { display: flex; justify-content: space-between; gap: 1rem; margin-bottom: 0.75rem; }
+    .project-detail-title { font-size: 1.1rem; font-weight: 600; color: var(--color-green); }
+    .project-detail-close { border: none; background: none; font-size: 1.3rem; cursor: pointer; }
+    .project-detail-meta { display: grid; gap: 0.5rem; font-size: 0.9rem; margin-bottom: 1rem; }
+    @media (min-width: 640px) { .project-detail-meta { grid-template-columns: repeat(2, minmax(0,1fr)); } }
+    .project-detail-meta dt { font-weight: 600; }
+    .project-detail-meta dd { margin: 0; }
+    .project-detail-updates { margin-top: 1rem; }
+    .project-detail-updates h3 { font-size: 0.95rem; margin-bottom: 0.4rem; color: var(--color-text); }
+    .project-update { border-left: 3px solid var(--color-green); padding-left: 0.6rem; margin-bottom: 0.6rem; font-size: 0.9rem; }
+    .project-update time { font-size: 0.8rem; color: var(--color-text-muted); display: block; }
+    .project-update strong { display: block; }
   </style>
 </head>
 <body>
   <div class="admin-wrap">
-    <h1 class="admin-heading">Constituency requests</h1>
-    <p class="admin-sub">View project requests from constituents. Access is password-protected.</p>
+    <h1 class="admin-heading">Constituency dashboard</h1>
+    <p class="admin-sub">At a glance: requests, projects, and timelines for Esan North East &amp; Esan South East.</p>
 
     <div id="admin-gate" class="admin-gate">
       <form id="gate-form">
@@ -44,26 +95,108 @@
     <div id="admin-content" style="display: none;">
       <p class="admin-back"><a href="/">← Back to site</a></p>
       <p class="admin-logout"><a href="#" id="admin-logout">Log out</a></p>
-      <div class="admin-table-wrap">
-        <table class="admin-table" aria-label="Constituency requests">
-          <thead>
-            <tr>
-              <th scope="col">Date</th>
-              <th scope="col">Name</th>
-              <th scope="col">Community</th>
-              <th scope="col">Category</th>
-              <th scope="col">Urgency</th>
-              <th scope="col">Details</th>
-              <th scope="col">Phone</th>
-              <th scope="col">Email</th>
-              <th scope="col">Status</th>
-            </tr>
-          </thead>
-          <tbody id="requests-tbody">
-          </tbody>
-        </table>
+
+      <div class="admin-summary" id="admin-summary">
+        <div class="summary-card">
+          <div class="summary-label">Open requests</div>
+          <div class="summary-value" id="sum-open-requests">0</div>
+          <div class="summary-note">Received / under review</div>
+        </div>
+        <div class="summary-card">
+          <div class="summary-label">Critical requests</div>
+          <div class="summary-value" id="sum-critical-requests">0</div>
+          <div class="summary-note">Marked as critical</div>
+        </div>
+        <div class="summary-card">
+          <div class="summary-label">In-progress projects</div>
+          <div class="summary-value" id="sum-projects-in-progress">0</div>
+          <div class="summary-note">Actively being executed</div>
+        </div>
+        <div class="summary-card">
+          <div class="summary-label">Completed projects</div>
+          <div class="summary-value" id="sum-projects-completed">0</div>
+          <div class="summary-note">Delivered for the constituency</div>
+        </div>
       </div>
-      <p id="admin-empty" class="admin-empty" style="display: none;">No requests yet.</p>
+
+      <div class="admin-tabs">
+        <button type="button" class="admin-tab admin-tab--active" data-tab="requests">Requests</button>
+        <button type="button" class="admin-tab" data-tab="projects">Projects (Kanban)</button>
+      </div>
+
+      <section class="admin-section admin-section--active" id="section-requests" aria-label="Requests">
+        <div class="admin-filters">
+          <label>Filter status
+            <select id="filter-request-status">
+              <option value="">All</option>
+              <option value="received">Received</option>
+              <option value="under_review">Under review</option>
+              <option value="approved">Approved</option>
+              <option value="completed">Completed</option>
+            </select>
+          </label>
+          <label>Filter urgency
+            <select id="filter-request-urgency">
+              <option value="">All</option>
+              <option value="Normal">Normal</option>
+              <option value="Urgent">Urgent</option>
+              <option value="Critical">Critical</option>
+            </select>
+          </label>
+          <label>Search
+            <input type="search" id="filter-request-search" placeholder="Name, community, details...">
+          </label>
+        </div>
+        <div class="admin-table-wrap">
+          <table class="admin-table" aria-label="Constituency requests">
+            <thead>
+              <tr>
+                <th scope="col">Date</th>
+                <th scope="col">Name</th>
+                <th scope="col">Community</th>
+                <th scope="col">Category</th>
+                <th scope="col">Urgency</th>
+                <th scope="col">Details</th>
+                <th scope="col">Phone</th>
+                <th scope="col">Email</th>
+                <th scope="col">Status</th>
+              </tr>
+            </thead>
+            <tbody id="requests-tbody">
+            </tbody>
+          </table>
+        </div>
+        <p id="admin-empty-requests" class="admin-empty" style="display: none;">No matching requests.</p>
+      </section>
+
+      <section class="admin-section" id="section-projects" aria-label="Projects board">
+        <div class="admin-filters">
+          <label>Filter community
+            <input type="search" id="filter-project-community" placeholder="Community name...">
+          </label>
+          <label>Filter category
+            <input type="search" id="filter-project-category" placeholder="Category (roads, health...)">
+          </label>
+        </div>
+        <div class="board" id="projects-board">
+          <!-- Kanban columns rendered by JS -->
+        </div>
+        <p id="admin-empty-projects" class="admin-empty" style="display: none;">No projects yet. Once projects are added in Supabase, they will appear here.</p>
+      </section>
+
+      <div class="project-detail-backdrop" id="project-detail-backdrop" role="dialog" aria-modal="true" aria-hidden="true">
+        <div class="project-detail" id="project-detail">
+          <div class="project-detail-header">
+            <div>
+              <div class="project-detail-title" id="project-detail-title"></div>
+              <div id="project-detail-status" style="font-size:0.85rem;color:var(--color-text-muted);"></div>
+            </div>
+            <button type="button" class="project-detail-close" id="project-detail-close" aria-label="Close project details">×</button>
+          </div>
+          <dl class="project-detail-meta" id="project-detail-meta"></dl>
+          <div class="project-detail-updates" id="project-detail-updates"></div>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -75,8 +208,35 @@
       var content = document.getElementById('admin-content');
       var gateForm = document.getElementById('gate-form');
       var gateMsg = document.getElementById('gate-msg');
-      var tbody = document.getElementById('requests-tbody');
-      var adminEmpty = document.getElementById('admin-empty');
+      var requestsTbody = document.getElementById('requests-tbody');
+      var adminEmptyRequests = document.getElementById('admin-empty-requests');
+      var adminEmptyProjects = document.getElementById('admin-empty-projects');
+      var boardEl = document.getElementById('projects-board');
+      var summaryOpen = document.getElementById('sum-open-requests');
+      var summaryCritical = document.getElementById('sum-critical-requests');
+      var summaryInProgress = document.getElementById('sum-projects-in-progress');
+      var summaryCompleted = document.getElementById('sum-projects-completed');
+
+      var tabs = Array.prototype.slice.call(document.querySelectorAll('.admin-tab'));
+      var sectionRequests = document.getElementById('section-requests');
+      var sectionProjects = document.getElementById('section-projects');
+
+      var filterRequestStatus = document.getElementById('filter-request-status');
+      var filterRequestUrgency = document.getElementById('filter-request-urgency');
+      var filterRequestSearch = document.getElementById('filter-request-search');
+
+      var filterProjectCommunity = document.getElementById('filter-project-community');
+      var filterProjectCategory = document.getElementById('filter-project-category');
+
+      var detailBackdrop = document.getElementById('project-detail-backdrop');
+      var detailClose = document.getElementById('project-detail-close');
+      var detailTitle = document.getElementById('project-detail-title');
+      var detailStatus = document.getElementById('project-detail-status');
+      var detailMeta = document.getElementById('project-detail-meta');
+      var detailUpdates = document.getElementById('project-detail-updates');
+
+      var allRequests = [];
+      var allProjects = [];
 
       var apiBase = '';
       if (typeof window.location.origin === 'string') {
@@ -91,46 +251,35 @@
       function showContent() {
         gate.style.display = 'none';
         content.style.display = 'block';
-        loadRequests();
+        loadData();
       }
 
-      function loadRequests() {
-        tbody.innerHTML = '';
-        adminEmpty.style.display = 'none';
-        adminEmpty.textContent = 'No requests yet.';
-        fetch(apiBase + '/api/admin-requests', { credentials: 'include' })
-          .then(function (r) {
-            if (r.status === 401) {
+      function loadData() {
+        var req = fetch(apiBase + '/api/admin-requests', { credentials: 'include' });
+        var proj = fetch(apiBase + '/api/admin-projects', { credentials: 'include' });
+
+        Promise.all([req, proj])
+          .then(function (responses) {
+            if (responses[0].status === 401 || responses[1].status === 401) {
               showGate();
-              return [];
+              return [[], []];
             }
-            if (!r.ok) throw new Error(r.status);
-            return r.json();
+            return Promise.all(responses.map(function (r) {
+              if (!r.ok) throw new Error(String(r.status));
+              return r.json();
+            }));
           })
-          .then(function (rows) {
-            if (!rows || rows.length === 0) {
-              adminEmpty.style.display = 'block';
-              return;
-            }
-            rows.forEach(function (row) {
-              var tr = document.createElement('tr');
-              var date = row.created_at ? new Date(row.created_at).toLocaleString(undefined, { dateStyle: 'short', timeStyle: 'short' }) : '—';
-              tr.innerHTML =
-                '<td>' + escapeHtml(date) + '</td>' +
-                '<td>' + escapeHtml(row.name || '—') + '</td>' +
-                '<td>' + escapeHtml(row.community || '—') + '</td>' +
-                '<td>' + escapeHtml(row.category || '—') + '</td>' +
-                '<td>' + escapeHtml(row.urgency || '—') + '</td>' +
-                '<td class="details-cell" title="' + escapeAttr(row.details || '') + '">' + escapeHtml((row.details || '—').slice(0, 80)) + (row.details && row.details.length > 80 ? '…' : '') + '</td>' +
-                '<td>' + escapeHtml(row.phone || '—') + '</td>' +
-                '<td>' + escapeHtml(row.email || '—') + '</td>' +
-                '<td>' + escapeHtml(row.status || 'received') + '</td>';
-              tbody.appendChild(tr);
-            });
+          .then(function (data) {
+            if (!data) return;
+            allRequests = data[0] || [];
+            allProjects = data[1] || [];
+            renderSummary();
+            renderRequests();
+            renderProjects();
           })
           .catch(function () {
-            adminEmpty.textContent = 'Could not load requests. Try logging in again.';
-            adminEmpty.style.display = 'block';
+            adminEmptyRequests.textContent = 'Could not load data. Try logging in again.';
+            adminEmptyRequests.style.display = 'block';
           });
       }
 
@@ -143,6 +292,235 @@
       function escapeAttr(s) {
         if (s == null) return '';
         return String(s).replace(/"/g, '&quot;');
+      }
+
+      function renderSummary() {
+        var openStatuses = ['received', 'under_review', null, ''];
+        var open = allRequests.filter(function (r) {
+          var st = (r.status || '').toLowerCase();
+          return openStatuses.indexOf(st) !== -1;
+        }).length;
+
+        var critical = allRequests.filter(function (r) {
+          return (r.urgency || '').toLowerCase() === 'critical';
+        }).length;
+
+        var inProgress = allProjects.filter(function (p) {
+          return (p.status || '').toLowerCase() === 'in_progress';
+        }).length;
+
+        var completed = allProjects.filter(function (p) {
+          return (p.status || '').toLowerCase() === 'completed';
+        }).length;
+
+        summaryOpen.textContent = open;
+        summaryCritical.textContent = critical;
+        summaryInProgress.textContent = inProgress;
+        summaryCompleted.textContent = completed;
+      }
+
+      function renderRequests() {
+        requestsTbody.innerHTML = '';
+        adminEmptyRequests.style.display = 'none';
+
+        var statusFilter = (filterRequestStatus.value || '').toLowerCase();
+        var urgencyFilter = (filterRequestUrgency.value || '').toLowerCase();
+        var search = (filterRequestSearch.value || '').toLowerCase();
+
+        var rows = allRequests.filter(function (r) {
+          if (statusFilter && (r.status || '').toLowerCase() !== statusFilter) return false;
+          if (urgencyFilter && (r.urgency || '').toLowerCase() !== urgencyFilter.toLowerCase()) return false;
+          if (search) {
+            var hay = ((r.name || '') + ' ' + (r.community || '') + ' ' + (r.category || '') + ' ' + (r.details || '')).toLowerCase();
+            if (hay.indexOf(search) === -1) return false;
+          }
+          return true;
+        });
+
+        if (!rows.length) {
+          adminEmptyRequests.style.display = 'block';
+          return;
+        }
+
+        rows.forEach(function (row) {
+          var tr = document.createElement('tr');
+          var date = row.created_at ? new Date(row.created_at).toLocaleString(undefined, { dateStyle: 'short', timeStyle: 'short' }) : '—';
+          tr.innerHTML =
+            '<td>' + escapeHtml(date) + '</td>' +
+            '<td>' + escapeHtml(row.name || '—') + '</td>' +
+            '<td>' + escapeHtml(row.community || '—') + '</td>' +
+            '<td>' + escapeHtml(row.category || '—') + '</td>' +
+            '<td>' + escapeHtml(row.urgency || '—') + '</td>' +
+            '<td class="details-cell" title="' + escapeAttr(row.details || '') + '">' + escapeHtml((row.details || '—').slice(0, 80)) + (row.details && row.details.length > 80 ? '…' : '') + '</td>' +
+            '<td>' + escapeHtml(row.phone || '—') + '</td>' +
+            '<td>' + escapeHtml(row.email || '—') + '</td>' +
+            '<td>' + escapeHtml(row.status || 'received') + '</td>';
+          requestsTbody.appendChild(tr);
+        });
+      }
+
+      function renderProjects() {
+        boardEl.innerHTML = '';
+        adminEmptyProjects.style.display = 'none';
+
+        var communityFilter = (filterProjectCommunity.value || '').toLowerCase();
+        var categoryFilter = (filterProjectCategory.value || '').toLowerCase();
+
+        var projects = allProjects.filter(function (p) {
+          if (communityFilter && String(p.community || '').toLowerCase().indexOf(communityFilter) === -1) return false;
+          if (categoryFilter && String(p.category || '').toLowerCase().indexOf(categoryFilter) === -1) return false;
+          return true;
+        });
+
+        if (!projects.length) {
+          adminEmptyProjects.style.display = 'block';
+          return;
+        }
+
+        var columns = [
+          { key: 'planned', title: 'Planned' },
+          { key: 'in_progress', title: 'In progress' },
+          { key: 'completed', title: 'Completed' }
+        ];
+
+        columns.forEach(function (col) {
+          var colEl = document.createElement('div');
+          colEl.className = 'board-column';
+          var header = document.createElement('div');
+          header.className = 'board-column-header';
+          var title = document.createElement('div');
+          title.className = 'board-column-title';
+          title.textContent = col.title;
+          var count = document.createElement('div');
+          count.className = 'board-column-count';
+          var colProjects = projects.filter(function (p) {
+            return (p.status || 'planned').toLowerCase() === col.key;
+          });
+          count.textContent = colProjects.length + ' project' + (colProjects.length === 1 ? '' : 's');
+          header.appendChild(title);
+          header.appendChild(count);
+          colEl.appendChild(header);
+
+          var cardsWrap = document.createElement('div');
+          cardsWrap.className = 'board-cards';
+
+          colProjects.forEach(function (p) {
+            var card = document.createElement('article');
+            card.className = 'board-card';
+            card.setAttribute('data-project-id', p.id);
+
+            var titleEl = document.createElement('div');
+            titleEl.className = 'board-card-title';
+            titleEl.textContent = p.title || 'Untitled project';
+            card.appendChild(titleEl);
+
+            var meta = document.createElement('div');
+            meta.className = 'board-card-meta';
+            var pieces = [];
+            if (p.community) pieces.push(p.community);
+            if (p.category) pieces.push(p.category);
+            meta.textContent = pieces.join(' • ');
+            card.appendChild(meta);
+
+            var tags = document.createElement('div');
+            if (p.community) {
+              var t1 = document.createElement('span');
+              t1.className = 'board-card-tag board-card-tag--community';
+              t1.textContent = p.community;
+              tags.appendChild(t1);
+            }
+            if (p.expected_end_date || p.next_milestone_date) {
+              var dateLabel = p.next_milestone_date ? 'Next: ' + p.next_milestone_date : 'Due: ' + p.expected_end_date;
+              var t2 = document.createElement('span');
+              t2.className = 'board-card-tag board-card-tag--date';
+              t2.textContent = dateLabel;
+              tags.appendChild(t2);
+            }
+            card.appendChild(tags);
+
+            if (p.allocation_amount != null) {
+              var amt = document.createElement('div');
+              amt.className = 'board-card-amount';
+              var curr = p.allocation_currency || 'NGN';
+              amt.textContent = curr + ' ' + String(p.allocation_amount);
+              card.appendChild(amt);
+            }
+
+            card.addEventListener('click', function () {
+              openProjectDetail(p.id);
+            });
+
+            cardsWrap.appendChild(card);
+          });
+
+          colEl.appendChild(cardsWrap);
+          boardEl.appendChild(colEl);
+        });
+      }
+
+      function openProjectDetail(id) {
+        if (!id) return;
+        detailBackdrop.classList.add('project-detail-backdrop--open');
+        detailBackdrop.setAttribute('aria-hidden', 'false');
+        detailTitle.textContent = 'Loading...';
+        detailStatus.textContent = '';
+        detailMeta.innerHTML = '';
+        detailUpdates.innerHTML = '';
+
+        fetch(apiBase + '/api/admin-project-detail?id=' + encodeURIComponent(id), { credentials: 'include' })
+          .then(function (r) {
+            if (!r.ok) throw new Error(String(r.status));
+            return r.json();
+          })
+          .then(function (payload) {
+            var p = payload.project || {};
+            detailTitle.textContent = p.title || 'Untitled project';
+            detailStatus.textContent = (p.status || 'planned').replace(/_/g, ' ');
+
+            var metaHtml = '';
+            function addMeta(label, value) {
+              if (!value) return;
+              metaHtml += '<div><dt>' + escapeHtml(label) + '</dt><dd>' + escapeHtml(value) + '</dd></div>';
+            }
+            addMeta('Community', p.community);
+            addMeta('Ward', p.ward);
+            addMeta('Category', p.category);
+            if (p.allocation_amount != null) {
+              addMeta('Allocation', (p.allocation_currency || 'NGN') + ' ' + String(p.allocation_amount));
+            }
+            addMeta('Allocation year', p.allocation_year ? String(p.allocation_year) : '');
+            addMeta('Start date', p.start_date);
+            addMeta('Expected end', p.expected_end_date);
+            addMeta('Actual end', p.actual_end_date);
+            addMeta('Next milestone', p.next_milestone_date);
+            if (p.summary) addMeta('Summary', p.summary);
+            detailMeta.innerHTML = metaHtml;
+
+            var updates = payload.updates || [];
+            if (!updates.length) {
+              detailUpdates.innerHTML = '<p style=\"font-size:0.9rem;color:var(--color-text-muted);\">No updates have been added yet.</p>';
+            } else {
+              var html = '<h3>Updates</h3>';
+              updates.forEach(function (u) {
+                var when = u.created_at ? new Date(u.created_at).toLocaleString() : '';
+                html += '<div class=\"project-update\">';
+                if (when) html += '<time>' + escapeHtml(when) + '</time>';
+                if (u.summary) html += '<strong>' + escapeHtml(u.summary) + '</strong>';
+                if (u.details) html += '<div>' + escapeHtml(u.details) + '</div>';
+                if (u.progress_percent != null) html += '<div>Progress: ' + escapeHtml(String(u.progress_percent)) + '%</div>';
+                html += '</div>';
+              });
+              detailUpdates.innerHTML = html;
+            }
+          })
+          .catch(function () {
+            detailTitle.textContent = 'Could not load project details';
+          });
+      }
+
+      function closeProjectDetail() {
+        detailBackdrop.classList.remove('project-detail-backdrop--open');
+        detailBackdrop.setAttribute('aria-hidden', 'true');
       }
 
       gateForm.addEventListener('submit', function (e) {
@@ -180,6 +558,32 @@
         fetch(apiBase + '/api/admin-logout', { credentials: 'include' }).then(function () {
           showGate();
         });
+      });
+
+      tabs.forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          tabs.forEach(function (b) { b.classList.remove('admin-tab--active'); });
+          btn.classList.add('admin-tab--active');
+          var tab = btn.getAttribute('data-tab');
+          sectionRequests.classList.toggle('admin-section--active', tab === 'requests');
+          sectionProjects.classList.toggle('admin-section--active', tab === 'projects');
+        });
+      });
+
+      filterRequestStatus.addEventListener('change', renderRequests);
+      filterRequestUrgency.addEventListener('change', renderRequests);
+      filterRequestSearch.addEventListener('input', renderRequests);
+
+      filterProjectCommunity.addEventListener('input', renderProjects);
+      filterProjectCategory.addEventListener('input', renderProjects);
+
+      detailClose.addEventListener('click', closeProjectDetail);
+      detailBackdrop.addEventListener('click', function (e) {
+        if (e.target === detailBackdrop) closeProjectDetail();
+      });
+
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') closeProjectDetail();
       });
 
       fetch(apiBase + '/api/admin-requests', { credentials: 'include' })
