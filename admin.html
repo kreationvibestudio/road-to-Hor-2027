@@ -76,6 +76,21 @@
     .project-update { border-left: 3px solid var(--color-green); padding-left: 0.6rem; margin-bottom: 0.6rem; font-size: 0.9rem; }
     .project-update time { font-size: 0.8rem; color: var(--color-text-muted); display: block; }
     .project-update strong { display: block; }
+    .admin-filters--row { align-items: center; }
+    .admin-filters--row .btn { margin-left: auto; }
+    .add-project-panel { max-width: 36rem; }
+    .add-project-form label { display: block; font-weight: 600; font-size: 0.9rem; margin-bottom: 0.25rem; }
+    .add-project-form label .required { color: var(--color-accent); }
+    .add-project-form input, .add-project-form select, .add-project-form textarea { width: 100%; padding: 0.5rem 0.6rem; border: 1px solid var(--color-border); border-radius: 6px; font-size: 0.95rem; margin-bottom: 0.75rem; }
+    .add-project-form textarea { resize: vertical; min-height: 4rem; }
+    .add-project-grid { display: grid; gap: 0 1rem; grid-template-columns: 1fr 1fr; }
+    .add-project-grid label { grid-column: 1 / -1; }
+    .add-project-grid input, .add-project-grid select, .add-project-grid textarea { grid-column: 1 / -1; margin-bottom: 0.5rem; }
+    .add-project-full { grid-column: 1 / -1; }
+    .add-project-msg { font-size: 0.9rem; margin: 0.5rem 0; min-height: 1.2rem; }
+    .add-project-msg.err { color: var(--color-accent); }
+    .add-project-msg.ok { color: var(--color-green); }
+    .add-project-actions { display: flex; gap: 0.75rem; justify-content: flex-end; margin-top: 1rem; }
   </style>
 </head>
 <body>
@@ -170,13 +185,14 @@
       </section>
 
       <section class="admin-section" id="section-projects" aria-label="Projects board">
-        <div class="admin-filters">
+        <div class="admin-filters admin-filters--row">
           <label>Filter community
             <input type="search" id="filter-project-community" placeholder="Community name...">
           </label>
           <label>Filter category
             <input type="search" id="filter-project-category" placeholder="Category (roads, health...)">
           </label>
+          <button type="button" class="btn btn-primary" id="admin-add-project-btn">Add project</button>
         </div>
         <div class="board" id="projects-board">
           <!-- Kanban columns rendered by JS -->
@@ -195,6 +211,78 @@
           </div>
           <dl class="project-detail-meta" id="project-detail-meta"></dl>
           <div class="project-detail-updates" id="project-detail-updates"></div>
+        </div>
+      </div>
+
+      <div class="project-detail-backdrop" id="add-project-backdrop" role="dialog" aria-modal="true" aria-labelledby="add-project-title" aria-hidden="true">
+        <div class="project-detail add-project-panel">
+          <div class="project-detail-header">
+            <h2 class="project-detail-title" id="add-project-title">Add constituency project</h2>
+            <button type="button" class="project-detail-close" id="add-project-close" aria-label="Close">×</button>
+          </div>
+          <form id="add-project-form" class="add-project-form">
+            <div class="add-project-grid">
+              <label for="add-project-title-input">Project title <span class="required">*</span></label>
+              <input type="text" id="add-project-title-input" name="title" required placeholder="e.g. Uromi–Ubiaja road rehabilitation" autocomplete="off">
+
+              <label for="add-project-community">Community</label>
+              <input type="text" id="add-project-community" name="community" placeholder="e.g. Uromi, Ubiaja">
+
+              <label for="add-project-ward">Ward</label>
+              <input type="text" id="add-project-ward" name="ward" placeholder="e.g. Ward 3">
+
+              <label for="add-project-category">Category</label>
+              <select id="add-project-category" name="category">
+                <option value="">— Select —</option>
+                <option value="Roads & transport">Roads & transport</option>
+                <option value="Water supply">Water supply</option>
+                <option value="Education">Education</option>
+                <option value="Healthcare">Healthcare</option>
+                <option value="Youth & empowerment">Youth & empowerment</option>
+                <option value="Agriculture & markets">Agriculture & markets</option>
+                <option value="Security">Security</option>
+                <option value="Power / electrification">Power / electrification</option>
+                <option value="Other">Other</option>
+              </select>
+
+              <label for="add-project-status">Status</label>
+              <select id="add-project-status" name="status">
+                <option value="planned">Planned</option>
+                <option value="in_progress">In progress</option>
+                <option value="completed">Completed</option>
+                <option value="on_hold">On hold</option>
+              </select>
+
+              <label for="add-project-amount">Allocation amount (₦)</label>
+              <input type="number" id="add-project-amount" name="allocation_amount" min="0" step="1" placeholder="e.g. 50000000">
+
+              <label for="add-project-currency">Currency</label>
+              <select id="add-project-currency" name="allocation_currency">
+                <option value="NGN">NGN</option>
+                <option value="USD">USD</option>
+              </select>
+
+              <label for="add-project-year">Allocation year</label>
+              <input type="number" id="add-project-year" name="allocation_year" min="2020" max="2030" placeholder="e.g. 2027">
+
+              <label for="add-project-start">Start date</label>
+              <input type="date" id="add-project-start" name="start_date">
+
+              <label for="add-project-expected-end">Expected end date</label>
+              <input type="date" id="add-project-expected-end" name="expected_end_date">
+
+              <label for="add-project-milestone">Next milestone date</label>
+              <input type="date" id="add-project-milestone" name="next_milestone_date">
+
+              <label for="add-project-summary" class="add-project-full">Summary / description</label>
+              <textarea id="add-project-summary" name="summary" class="add-project-full" rows="4" placeholder="Brief description of the project and expected impact..."></textarea>
+            </div>
+            <p class="add-project-msg" id="add-project-msg" aria-live="polite"></p>
+            <div class="add-project-actions">
+              <button type="button" class="btn" id="add-project-cancel">Cancel</button>
+              <button type="submit" class="btn btn-primary" id="add-project-submit">Save project</button>
+            </div>
+          </form>
         </div>
       </div>
     </div>
@@ -234,6 +322,14 @@
       var detailStatus = document.getElementById('project-detail-status');
       var detailMeta = document.getElementById('project-detail-meta');
       var detailUpdates = document.getElementById('project-detail-updates');
+
+      var addProjectBackdrop = document.getElementById('add-project-backdrop');
+      var addProjectClose = document.getElementById('add-project-close');
+      var addProjectCancel = document.getElementById('add-project-cancel');
+      var addProjectForm = document.getElementById('add-project-form');
+      var addProjectMsg = document.getElementById('add-project-msg');
+      var addProjectSubmit = document.getElementById('add-project-submit');
+      var addProjectBtn = document.getElementById('admin-add-project-btn');
 
       var allRequests = [];
       var allProjects = [];
@@ -523,6 +619,91 @@
         detailBackdrop.setAttribute('aria-hidden', 'true');
       }
 
+      function openAddProject() {
+        addProjectMsg.textContent = '';
+        addProjectMsg.classList.remove('err', 'ok');
+        addProjectBackdrop.classList.add('project-detail-backdrop--open');
+        addProjectBackdrop.setAttribute('aria-hidden', 'false');
+      }
+
+      function closeAddProject() {
+        addProjectBackdrop.classList.remove('project-detail-backdrop--open');
+        addProjectBackdrop.setAttribute('aria-hidden', 'true');
+        addProjectForm.reset();
+      }
+
+      if (addProjectBtn) {
+        addProjectBtn.addEventListener('click', openAddProject);
+      }
+      if (addProjectClose) addProjectClose.addEventListener('click', closeAddProject);
+      if (addProjectCancel) addProjectCancel.addEventListener('click', closeAddProject);
+      addProjectBackdrop.addEventListener('click', function (e) {
+        if (e.target === addProjectBackdrop) closeAddProject();
+      });
+
+      addProjectForm.addEventListener('submit', function (e) {
+        e.preventDefault();
+        addProjectMsg.textContent = '';
+        addProjectMsg.classList.remove('err', 'ok');
+
+        var fd = new FormData(addProjectForm);
+        var body = {
+          title: (fd.get('title') || '').trim(),
+          community: (fd.get('community') || '').trim(),
+          ward: (fd.get('ward') || '').trim(),
+          category: (fd.get('category') || '').trim(),
+          status: fd.get('status') || 'planned',
+          allocation_amount: fd.get('allocation_amount') || null,
+          allocation_currency: fd.get('allocation_currency') || 'NGN',
+          allocation_year: fd.get('allocation_year') || null,
+          start_date: (fd.get('start_date') || '').trim() || null,
+          expected_end_date: (fd.get('expected_end_date') || '').trim() || null,
+          next_milestone_date: (fd.get('next_milestone_date') || '').trim() || null,
+          summary: (fd.get('summary') || '').trim() || null
+        };
+        if (!body.title) {
+          addProjectMsg.textContent = 'Please enter a project title.';
+          addProjectMsg.classList.add('err');
+          return;
+        }
+
+        addProjectSubmit.disabled = true;
+        addProjectMsg.textContent = 'Saving…';
+
+        fetch(apiBase + '/api/admin-project-create', {
+          method: 'POST',
+          credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body)
+        })
+          .then(function (r) {
+            if (r.status === 401) {
+              showGate();
+              return null;
+            }
+            if (!r.ok) return r.json().then(function (data) { throw new Error(data.error || r.statusText); });
+            return r.json();
+          })
+          .then(function (data) {
+            if (!data) return;
+            addProjectMsg.textContent = 'Project saved.';
+            addProjectMsg.classList.add('ok');
+            addProjectMsg.classList.remove('err');
+            loadData();
+            setTimeout(function () {
+              closeAddProject();
+              addProjectMsg.textContent = '';
+            }, 1500);
+          })
+          .catch(function (err) {
+            addProjectMsg.textContent = err.message || 'Could not save project. Try again.';
+            addProjectMsg.classList.add('err');
+          })
+          .finally(function () {
+            addProjectSubmit.disabled = false;
+          });
+      });
+
       gateForm.addEventListener('submit', function (e) {
         e.preventDefault();
         gateMsg.textContent = '';
@@ -555,9 +736,9 @@
 
       document.getElementById('admin-logout').addEventListener('click', function (e) {
         e.preventDefault();
-        fetch(apiBase + '/api/admin-logout', { credentials: 'include' }).then(function () {
-          showGate();
-        });
+        fetch(apiBase + '/api/admin-logout', { credentials: 'include' })
+          .then(function () { showGate(); })
+          .catch(function () { showGate(); });
       });
 
       tabs.forEach(function (btn) {

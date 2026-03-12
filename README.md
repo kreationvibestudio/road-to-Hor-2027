@@ -65,14 +65,15 @@ If you see **Invalid time zone specified: Etc/Unknown**:
 2. Run the script in `supabase/timezone-fix.sql` (sets the database timezone to `UTC`).
 3. Reconnect or refresh; new connections will use the correct timezone.
 
-## Admin page (view requests)
+## Admin page (requests & projects)
 
-The **Admin** link in the footer goes to a password-protected page where you can view all constituency project requests from anywhere.
+The **Admin** link in the footer goes to a password-protected page where you can view constituency requests and manage projects.
 
 ### How it works
 
 - Login uses **server-side auth**: you enter the password on the site; the server checks it and sets a secure **HttpOnly cookie** (no password is stored in the browser).
 - Requests are loaded via an **API** that uses your Supabase **service role** key, so the list is not exposed to the public.
+- **Add project**: On the Projects (Kanban) tab, use **Add project** to create a new constituency project. Fields include title, community, ward, category (e.g. Roads & transport, Water, Education, Healthcare), status, allocation amount/year, dates, and summary. New projects appear on the Kanban board after saving.
 - Session lasts **24 hours**; use **Log out** to end it early.
 
 ### Vercel environment variables
