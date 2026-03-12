@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin — Constituency requests</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .admin-wrap { max-width: 64rem; margin: 0 auto; padding: 2rem 1.5rem; }
+    .admin-heading { font-family: var(--font-heading); color: var(--color-green); margin-bottom: 0.5rem; }
+    .admin-sub { color: var(--color-text-muted); margin-bottom: 1.5rem; }
+    .admin-gate { background: var(--color-white); padding: 2rem; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); max-width: 24rem; }
+    .admin-gate label { display: block; font-weight: 600; margin-bottom: 0.5rem; }
+    .admin-gate input[type="password"] { width: 100%; padding: 0.6rem 0.75rem; border: 1px solid var(--color-border); border-radius: 8px; font-size: 1rem; margin-bottom: 1rem; }
+    .admin-gate .btn { width: 100%; }
+    .admin-gate .msg { font-size: 0.9rem; margin-top: 0.75rem; color: var(--color-text-muted); }
+    .admin-gate .msg.err { color: var(--color-accent); }
+    .admin-table-wrap { overflow-x: auto; margin-top: 1rem; }
+    .admin-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+    .admin-table th, .admin-table td { padding: 0.6rem 0.75rem; text-align: left; border-bottom: 1px solid var(--color-border); }
+    .admin-table th { background: var(--color-green-muted); font-weight: 600; color: var(--color-green); }
+    .admin-table tr:hover td { background: rgba(0,0,0,0.02); }
+    .admin-table .details-cell { max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .admin-table .details-cell:hover { white-space: normal; }
+    .admin-logout { margin-bottom: 1rem; }
+    .admin-empty { color: var(--color-text-muted); padding: 2rem; text-align: center; }
+    .admin-back { margin-bottom: 1rem; }
+  </style>
+</head>
+<body>
+  <div class="admin-wrap">
+    <h1 class="admin-heading">Constituency requests</h1>
+    <p class="admin-sub">View project requests from constituents. Access is password-protected.</p>
+
+    <div id="admin-gate" class="admin-gate">
+      <form id="gate-form">
+        <label for="admin-password">Password</label>
+        <input type="password" id="admin-password" name="password" autocomplete="current-password" placeholder="Admin password">
+        <button type="submit" class="btn btn-primary">View requests</button>
+      </form>
+      <p class="msg" id="gate-msg" aria-live="polite"></p>
+    </div>
+
+    <div id="admin-content" style="display: none;">
+      <p class="admin-back"><a href="/">← Back to site</a></p>
+      <p class="admin-logout"><a href="#" id="admin-logout">Log out</a></p>
+      <div class="admin-table-wrap">
+        <table class="admin-table" aria-label="Constituency requests">
+          <thead>
+            <tr>
+              <th scope="col">Date</th>
+              <th scope="col">Name</th>
+              <th scope="col">Community</th>
+              <th scope="col">Category</th>
+              <th scope="col">Urgency</th>
+              <th scope="col">Details</th>
+              <th scope="col">Phone</th>
+              <th scope="col">Email</th>
+              <th scope="col">Status</th>
+            </tr>
+          </thead>
+          <tbody id="requests-tbody">
+          </tbody>
+        </table>
+      </div>
+      <p id="admin-empty" class="admin-empty" style="display: none;">No requests yet.</p>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      'use strict';
+
+      var gate = document.getElementById('admin-gate');
+      var content = document.getElementById('admin-content');
+      var gateForm = document.getElementById('gate-form');
+      var gateMsg = document.getElementById('gate-msg');
+      var tbody = document.getElementById('requests-tbody');
+      var adminEmpty = document.getElementById('admin-empty');
+
+      var apiBase = '';
+      if (typeof window.location.origin === 'string') {
+        apiBase = window.location.origin;
+      }
+
+      function showGate() {
+        gate.style.display = 'block';
+        content.style.display = 'none';
+      }
+
+      function showContent() {
+        gate.style.display = 'none';
+        content.style.display = 'block';
+        loadRequests();
+      }
+
+      function loadRequests() {
+        tbody.innerHTML = '';
+        adminEmpty.style.display = 'none';
+        adminEmpty.textContent = 'No requests yet.';
+        fetch(apiBase + '/api/admin-requests', { credentials: 'include' })
+          .then(function (r) {
+            if (r.status === 401) {
+              showGate();
+              return [];
+            }
+            if (!r.ok) throw new Error(r.status);
+            return r.json();
+          })
+          .then(function (rows) {
+            if (!rows || rows.length === 0) {
+              adminEmpty.style.display = 'block';
+              return;
+            }
+            rows.forEach(function (row) {
+              var tr = document.createElement('tr');
+              var date = row.created_at ? new Date(row.created_at).toLocaleString(undefined, { dateStyle: 'short', timeStyle: 'short' }) : '—';
+              tr.innerHTML =
+                '<td>' + escapeHtml(date) + '</td>' +
+                '<td>' + escapeHtml(row.name || '—') + '</td>' +
+                '<td>' + escapeHtml(row.community || '—') + '</td>' +
+                '<td>' + escapeHtml(row.category || '—') + '</td>' +
+                '<td>' + escapeHtml(row.urgency || '—') + '</td>' +
+                '<td class="details-cell" title="' + escapeAttr(row.details || '') + '">' + escapeHtml((row.details || '—').slice(0, 80)) + (row.details && row.details.length > 80 ? '…' : '') + '</td>' +
+                '<td>' + escapeHtml(row.phone || '—') + '</td>' +
+                '<td>' + escapeHtml(row.email || '—') + '</td>' +
+                '<td>' + escapeHtml(row.status || 'received') + '</td>';
+              tbody.appendChild(tr);
+            });
+          })
+          .catch(function () {
+            adminEmpty.textContent = 'Could not load requests. Try logging in again.';
+            adminEmpty.style.display = 'block';
+          });
+      }
+
+      function escapeHtml(s) {
+        if (s == null) return '';
+        var div = document.createElement('div');
+        div.textContent = s;
+        return div.innerHTML;
+      }
+      function escapeAttr(s) {
+        if (s == null) return '';
+        return String(s).replace(/"/g, '&quot;');
+      }
+
+      gateForm.addEventListener('submit', function (e) {
+        e.preventDefault();
+        gateMsg.textContent = '';
+        gateMsg.classList.remove('err');
+        var input = document.getElementById('admin-password');
+        var password = input ? input.value : '';
+        if (!password) {
+          gateMsg.textContent = 'Enter the admin password.';
+          gateMsg.classList.add('err');
+          return;
+        }
+        fetch(apiBase + '/api/admin-login', {
+          method: 'POST',
+          credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ password: password })
+        }).then(function (r) {
+          if (r.ok) {
+            input.value = '';
+            showContent();
+          } else {
+            gateMsg.textContent = 'Incorrect password.';
+            gateMsg.classList.add('err');
+          }
+        }).catch(function () {
+          gateMsg.textContent = 'Network error. Try again.';
+          gateMsg.classList.add('err');
+        });
+      });
+
+      document.getElementById('admin-logout').addEventListener('click', function (e) {
+        e.preventDefault();
+        fetch(apiBase + '/api/admin-logout', { credentials: 'include' }).then(function () {
+          showGate();
+        });
+      });
+
+      fetch(apiBase + '/api/admin-requests', { credentials: 'include' })
+        .then(function (r) {
+          if (r.ok) showContent();
+        })
+        .catch(function () {});
+    })();
+  </script>
+</body>
+</html>

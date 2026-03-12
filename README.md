@@ -64,3 +64,36 @@ If you see **Invalid time zone specified: Etc/Unknown**:
 1. Open [Supabase Dashboard](https://supabase.com/dashboard) → your project → **SQL Editor**.
 2. Run the script in `supabase/timezone-fix.sql` (sets the database timezone to `UTC`).
 3. Reconnect or refresh; new connections will use the correct timezone.
+
+## Admin page (view requests)
+
+The **Admin** link in the footer goes to a password-protected page where you can view all constituency project requests from anywhere.
+
+### How it works
+
+- Login uses **server-side auth**: you enter the password on the site; the server checks it and sets a secure **HttpOnly cookie** (no password is stored in the browser).
+- Requests are loaded via an **API** that uses your Supabase **service role** key, so the list is not exposed to the public.
+- Session lasts **24 hours**; use **Log out** to end it early.
+
+### Vercel environment variables
+
+For the admin page and API to work on the live site, set these in [Vercel Dashboard](https://vercel.com/dashboard) → your project → **Settings → Environment variables**:
+
+| Variable | Description |
+|----------|-------------|
+| `ADMIN_PASSWORD` | The password you use to log in to the admin page (e.g. a strong password only you know). |
+| `SUPABASE_URL` | Your Supabase project URL (e.g. `https://xxxxx.supabase.co`). |
+| `SUPABASE_SERVICE_ROLE_KEY` | From Supabase Dashboard → **Project Settings → API** → **service_role** (secret). Never expose this in the frontend. |
+
+Redeploy the project after adding or changing variables.
+
+### Local development
+
+To test the admin flow locally with Vercel CLI:
+
+```bash
+npm i -g vercel
+vercel dev
+```
+
+Set the same env vars in `.env.local` (do not commit this file) or via `vercel env pull`. Then open **http://localhost:3000/admin.html** and log in.

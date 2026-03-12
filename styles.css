@@ -1019,6 +1019,17 @@ body {
   opacity: 0.9;
 }
 
+.footer-admin-link {
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.85);
+  text-decoration: none;
+}
+.footer-admin-link:hover,
+.footer-admin-link:focus {
+  color: var(--color-white);
+  text-decoration: underline;
+}
+
 /* Focus styles */
 a:focus-visible,
 button:focus-visible {

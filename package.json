@@ -1,0 +1,9 @@
+{
+  "name": "road-to-hor-2027",
+  "version": "1.0.0",
+  "description": "Campaign website — House of Reps 2027, Esan North East & Esan South East",
+  "private": true,
+  "dependencies": {
+    "@supabase/supabase-js": "^2.45.0"
+  }
+}
