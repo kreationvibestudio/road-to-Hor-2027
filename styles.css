@@ -362,6 +362,23 @@ body {
   position: relative;
 }
 
+.about-photo-figure {
+  margin: 0;
+}
+
+.about-photo-img {
+  display: block;
+  width: 100%;
+  max-width: 280px;
+  height: auto;
+  aspect-ratio: 3 / 4;
+  max-height: 360px;
+  object-fit: cover;
+  object-position: center top;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
 .photo-placeholder {
   display: flex;
   flex-direction: column;
