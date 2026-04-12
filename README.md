@@ -13,19 +13,59 @@ Campaign site for **House of Representatives 2027**, **Esan North East & Esan So
 
 ## Run locally
 
-1. Open the project folder in Cursor (or any editor).
-2. Serve the site with a simple HTTP server, or open `index.html` in a browser.
+This project uses **Vite** (`npm run dev`). For day-to-day work, prefer **Docker Desktop** so Node and dependencies match everywhere.
+
+### Docker Desktop (recommended)
+
+Prerequisites: [Docker Desktop](https://www.docker.com/products/docker-desktop/) installed and running.
+
+From the project root (`road-to-Hor-2027/`):
+
+```bash
+docker compose up --build
+```
+
+Open **http://localhost:5173** (Vite dev server; `--host 0.0.0.0` is set for containers).
+
+- Source is bind-mounted from your machine; `node_modules` lives in a Compose volume so installs stay inside Linux and stay fast.
+- On Windows, `CHOKIDAR_USEPOLLING=true` is set to improve file-watch reliability.
+
+**Production-like preview** (serves the built `dist/` with Vite preview on port **4173**):
+
+```bash
+docker compose --profile preview up --build preview
+```
+
+Then open **http://localhost:4173**.
+
+**One-off production build** (no running server):
+
+```bash
+docker build --target build -t road-to-hor-2027:build .
+```
+
+The built files are in the image at `/app/dist` (inspect with `docker run --rm road-to-hor-2027:build ls -la /app/dist`).
+
+### Node on the host (without Docker)
+
+```bash
+npm ci
+npm run dev
+```
+
+Open **http://localhost:5173**.
+
+### Legacy: static server only
+
+You can still serve files with a simple HTTP server, but the Vite module bundle and some features expect `npm run dev` or a proper `dist/` deploy.
 
 Using Python:
 
 ```bash
-# Python 3
 python3 -m http.server 8000
 ```
 
-Then open **http://localhost:8000** in your browser.
-
-Using Node (if you have `npx`):
+Using Node:
 
 ```bash
 npx serve .
@@ -45,7 +85,8 @@ npx serve .
 
 - **index.html** — Single-page site: Hero, About, Why I’m Running, Vision & Priorities, FAQ, Contact.
 - **styles.css** — Layout and styling (ADC-inspired green, mobile-first).
-- **script.js** — Mobile menu and smooth scroll.
+- **main.js** — Mobile menu, smooth scroll, manifesto language toggle, request form, funds table (loaded as a Vite module).
+- **Dockerfile** / **docker-compose.yml** — Run dev and preview with Docker Desktop.
 
 ## Hosting
 
@@ -55,7 +96,7 @@ You can host this as static files on:
 - **Netlify** or **Vercel** — Drag the folder or connect the repo.
 - Any web host that serves HTML/CSS/JS.
 
-No build step required; upload the project folder as-is.
+Production deploys typically use **`npm run build`** (outputs `dist/`). You can also build inside Docker (`docker build --target build`).
 
 ## Supabase
 

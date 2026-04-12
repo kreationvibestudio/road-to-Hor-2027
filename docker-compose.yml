@@ -1,0 +1,31 @@
+# Docker Desktop: dev server + optional production preview
+# Dev:  docker compose up --build
+# Preview (after build stage): docker compose --profile preview up --build preview
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: development
+    ports:
+      - "5173:5173"
+    volumes:
+      - .:/app
+      - node_modules:/app/node_modules
+    environment:
+      CHOKIDAR_USEPOLLING: "true"
+    command: ["npm", "run", "dev", "--", "--host", "0.0.0.0", "--port", "5173"]
+
+  preview:
+    profiles:
+      - preview
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: preview
+    ports:
+      - "4173:4173"
+
+volumes:
+  node_modules:

@@ -1,0 +1,10 @@
+node_modules
+dist
+.git
+.cursor
+.vercel
+.env
+.env.*
+*.log
+admin-config.js
+tools
