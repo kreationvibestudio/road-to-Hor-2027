@@ -1,8 +1,10 @@
 # House of Reps 2027 — Campaign Website
 
-Campaign site for **House of Representatives 2027**, **Esan North East & Esan South East Federal Constituency**, under the **ADC (African Democratic Congress)**.
+Campaign site for **House of Representatives 2027**, **Esan North East & Esan South East Federal Constituency**, under the **NDC (Nigerian Democratic Congress)**.
 
 **Live site:** [road-to-hor-2027.vercel.app](https://road-to-hor-2027.vercel.app)
+
+**Launch checklist:** [LAUNCH-CHECKLIST.md](LAUNCH-CHECKLIST.md) — content, security, testing, and go-live tasks.
 
 ## Message
 
@@ -14,6 +16,26 @@ Campaign site for **House of Representatives 2027**, **Esan North East & Esan So
 ## Run locally
 
 This project uses **Vite** (`npm run dev`). For day-to-day work, prefer **Docker Desktop** so Node and dependencies match everywhere.
+
+## Connection quick fix (GitHub + Vercel)
+
+If your machine cannot find `git`, `gh`, `node`, or `vercel` in PATH, this repo ships local wrappers:
+
+- `git-local.cmd` - uses bundled Git in `tools/git`
+- `npm-local.cmd` - uses bundled Node/npm in `tools/node-v22.14.0-win-x64`
+- `vercel-local.cmd` - runs Vercel CLI via local npm
+
+Run this health check from project root:
+
+```bash
+check-connections.cmd
+```
+
+If Vercel auth is missing, run:
+
+```bash
+vercel-local.cmd login
+```
 
 ### Docker Desktop (recommended)
 
@@ -84,7 +106,7 @@ npx serve .
 ## Structure
 
 - **index.html** — Single-page site: Hero, About, Why I’m Running, Vision & Priorities, FAQ, Contact.
-- **styles.css** — Layout and styling (ADC-inspired green, mobile-first).
+- **styles.css** — Layout and styling (NDC-inspired navy blue & red, mobile-first).
 - **main.js** — Mobile menu, smooth scroll, manifesto language toggle, request form, funds table (loaded as a Vite module).
 - **Dockerfile** / **docker-compose.yml** — Run dev and preview with Docker Desktop.
 
