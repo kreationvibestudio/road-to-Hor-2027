@@ -15,6 +15,10 @@
 <body>
   <a href="#main" class="skip-link">Skip to main content</a>
 
+  <div class="bg-blob bg-blob--primary" aria-hidden="true"></div>
+  <div class="bg-blob bg-blob--accent" aria-hidden="true"></div>
+  <div class="bg-blob bg-blob--secondary" aria-hidden="true"></div>
+
   <header class="site-header" role="banner">
     <div class="container header-inner">
       <a href="#" class="logo" aria-label="Campaign home">
@@ -65,9 +69,13 @@
           >
         </figure>
       </div>
+      <a href="#about" class="hero-scroll-cue" aria-label="Scroll to learn more">Scroll</a>
+      <svg class="section-divider section-divider--bottom" viewBox="0 0 1200 80" preserveAspectRatio="none" aria-hidden="true">
+        <path d="M0,40 Q600,0 1200,40 L1200,80 L0,80 Z" />
+      </svg>
     </section>
 
-    <section id="about" class="section about" aria-labelledby="about-heading">
+    <section id="about" class="section about reveal" aria-labelledby="about-heading">
       <div class="container">
         <h2 id="about-heading">Who I am</h2>
         <div class="about-inner">
@@ -93,30 +101,36 @@
       </div>
     </section>
 
-    <section class="stats-band" aria-label="Campaign commitments">
+    <section class="stats-band reveal" aria-label="Campaign commitments">
+      <svg class="section-divider section-divider--top" viewBox="0 0 1200 80" preserveAspectRatio="none" aria-hidden="true">
+        <path d="M0,0 L1200,0 L1200,40 Q600,80 0,40 Z" />
+      </svg>
       <div class="container">
         <ul class="stats-list">
           <li class="stat-item">
-            <span class="stat-number">500+</span>
+            <span class="stat-number" data-count="500" data-suffix="+">500+</span>
             <span class="stat-label">Youths in digital skills program yearly</span>
           </li>
           <li class="stat-item">
-            <span class="stat-number">4</span>
+            <span class="stat-number" data-count="4">4</span>
             <span class="stat-label">Town hall meetings every year</span>
           </li>
           <li class="stat-item">
-            <span class="stat-number">100%</span>
+            <span class="stat-number" data-count="100" data-suffix="%">100%</span>
             <span class="stat-label">Constituency projects published online</span>
           </li>
         </ul>
       </div>
+      <svg class="section-divider section-divider--bottom" viewBox="0 0 1200 80" preserveAspectRatio="none" aria-hidden="true">
+        <path d="M0,40 Q600,0 1200,40 L1200,80 L0,80 Z" />
+      </svg>
     </section>
 
-    <blockquote class="quote-block quote-block--first">
+    <blockquote class="quote-block quote-block--first reveal">
       <p>I have what it takes to lead.</p>
     </blockquote>
 
-    <section id="why-running" class="section why-running" aria-labelledby="why-heading">
+    <section id="why-running" class="section why-running reveal" aria-labelledby="why-heading">
       <div class="container">
         <h2 id="why-heading">Why I'm running</h2>
         <p class="section-intro">You deserve to know exactly why I want to represent you. Here’s my answer.</p>
@@ -141,7 +155,7 @@
       </div>
     </section>
 
-    <section id="vision" class="section vision" aria-labelledby="vision-heading">
+    <section id="vision" class="section vision reveal" aria-labelledby="vision-heading">
       <div class="container">
         <h2 id="vision-heading">Vision & priorities</h2>
         <p class="section-intro">What I will work for in the House of Representatives.</p>
@@ -192,11 +206,11 @@
       </div>
     </section>
 
-    <blockquote class="quote-block">
+    <blockquote class="quote-block reveal">
       <p>Representation must not live in Abuja alone.</p>
     </blockquote>
 
-    <section id="manifesto" class="section manifesto" aria-labelledby="manifesto-heading">
+    <section id="manifesto" class="section manifesto reveal" aria-labelledby="manifesto-heading">
       <div class="container container--wide">
         <header class="manifesto-header">
           <p class="manifesto-label">Manifesto</p>
@@ -407,11 +421,17 @@
       </div>
     </section>
 
-    <blockquote class="quote-block quote-block--dark">
+    <blockquote class="quote-block quote-block--dark reveal">
+      <svg class="section-divider section-divider--top" viewBox="0 0 1200 80" preserveAspectRatio="none" aria-hidden="true">
+        <path d="M0,0 L1200,0 L1200,40 Q600,80 0,40 Z" />
+      </svg>
       <p>Together we will bring back humanity to politics.</p>
+      <svg class="section-divider section-divider--bottom" viewBox="0 0 1200 80" preserveAspectRatio="none" aria-hidden="true">
+        <path d="M0,40 Q600,0 1200,40 L1200,80 L0,80 Z" />
+      </svg>
     </blockquote>
 
-    <section id="projects" class="section projects" aria-labelledby="projects-heading">
+    <section id="projects" class="section projects reveal" aria-labelledby="projects-heading">
       <div class="container">
         <h2 id="projects-heading">Constituency projects</h2>
         <p class="section-intro">This is where you will be able to see every constituency project — what it is, where it is happening, how much is allocated, and how far it has gone.</p>
@@ -457,7 +477,7 @@
       </div>
     </section>
 
-    <section id="plans" class="section plans" aria-labelledby="plans-heading">
+    <section id="plans" class="section plans reveal" aria-labelledby="plans-heading">
       <div class="container">
         <h2 id="plans-heading">Plans and priorities</h2>
         <p class="section-intro">A simple view of what we intend to do each year, so you can see our focus and measure results.</p>
@@ -491,7 +511,7 @@
       </div>
     </section>
 
-    <section id="reports" class="section reports" aria-labelledby="reports-heading">
+    <section id="reports" class="section reports reveal" aria-labelledby="reports-heading">
       <div class="container">
         <h2 id="reports-heading">Reports and accountability</h2>
         <p class="section-intro">Here you will find regular reports on work done in Abuja and across the constituency — in plain language, not complicated documents.</p>
@@ -514,7 +534,7 @@
       </div>
     </section>
 
-    <section id="funds" class="section funds" aria-labelledby="funds-heading">
+    <section id="funds" class="section funds reveal" aria-labelledby="funds-heading">
       <div class="container">
         <h2 id="funds-heading">Funds and transparency</h2>
         <p class="section-intro">Public office is a trust. This section will show how constituency-related funds are allocated and used.</p>
@@ -542,7 +562,7 @@
       </div>
     </section>
 
-    <section id="requests" class="section requests" aria-labelledby="requests-heading">
+    <section id="requests" class="section requests reveal" aria-labelledby="requests-heading">
       <div class="container">
         <h2 id="requests-heading">Request a constituency project</h2>
         <p class="section-intro">Tell us what project would make life easier in your community — roads, schools, health centres, water, youth programs, and more.</p>
@@ -613,7 +633,7 @@
       </div>
     </section>
 
-    <section id="faq" class="section faq" aria-labelledby="faq-heading">
+    <section id="faq" class="section faq reveal" aria-labelledby="faq-heading">
       <div class="container">
         <h2 id="faq-heading">Questions you might have</h2>
         <p class="section-intro">Straight answers to what voters often ask.</p>
@@ -642,7 +662,7 @@
       </div>
     </section>
 
-    <section id="contact" class="section contact" aria-labelledby="contact-heading">
+    <section id="contact" class="section contact reveal" aria-labelledby="contact-heading">
       <div class="container">
         <h2 id="contact-heading">Get in touch</h2>
         <p class="section-intro">Your voice matters. Reach out with questions, ideas, or to support the campaign.</p>
@@ -657,6 +677,9 @@
   </main>
 
   <footer class="site-footer" role="contentinfo">
+    <svg class="section-divider section-divider--top" viewBox="0 0 1200 80" preserveAspectRatio="none" aria-hidden="true">
+      <path d="M0,0 L1200,0 L1200,40 Q600,80 0,40 Z" />
+    </svg>
     <div class="container">
       <p>House of Representatives 2027 · Esan North East & Esan South East Federal Constituency</p>
       <p>NDC — Nigerian Democratic Congress · Service to the People</p>

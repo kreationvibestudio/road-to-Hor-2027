@@ -1,6 +1,66 @@
 (function () {
   'use strict';
 
+  // Scroll-triggered reveal animations for sections.
+  // Sections with `.reveal` start hidden (via CSS) and lift in as they
+  // intersect the viewport. Respect prefers-reduced-motion.
+  var prefersReducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var revealTargets = document.querySelectorAll('.reveal');
+  if (revealTargets.length) {
+    if (prefersReducedMotion || typeof IntersectionObserver === 'undefined') {
+      revealTargets.forEach(function (el) { el.classList.add('is-visible'); });
+    } else {
+      var revealObserver = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-visible');
+            revealObserver.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.12, rootMargin: '0px 0px -10% 0px' });
+      revealTargets.forEach(function (el) { revealObserver.observe(el); });
+    }
+  }
+
+  // Stat numbers: count up from 0 the first time they scroll into view.
+  var statNumbers = document.querySelectorAll('.stat-number[data-count]');
+  if (statNumbers.length) {
+    var animateCount = function (el) {
+      var target = parseInt(el.getAttribute('data-count'), 10) || 0;
+      var suffix = el.getAttribute('data-suffix') || '';
+      if (prefersReducedMotion) {
+        el.textContent = target + suffix;
+        return;
+      }
+      var duration = 1400;
+      var startTime = null;
+      var step = function (timestamp) {
+        if (startTime === null) startTime = timestamp;
+        var progress = Math.min((timestamp - startTime) / duration, 1);
+        // ease-out cubic
+        var eased = 1 - Math.pow(1 - progress, 3);
+        var value = Math.round(target * eased);
+        el.textContent = value + suffix;
+        if (progress < 1) window.requestAnimationFrame(step);
+      };
+      window.requestAnimationFrame(step);
+    };
+
+    if (typeof IntersectionObserver === 'undefined') {
+      statNumbers.forEach(animateCount);
+    } else {
+      var countObserver = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          if (entry.isIntersecting) {
+            animateCount(entry.target);
+            countObserver.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.4 });
+      statNumbers.forEach(function (el) { countObserver.observe(el); });
+    }
+  }
+
   var navToggle = document.querySelector('.nav-toggle');
   var nav = document.querySelector('#nav-menu');
 
