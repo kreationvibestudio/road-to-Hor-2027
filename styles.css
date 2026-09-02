@@ -171,9 +171,11 @@ main {
 
 .logo-img {
   display: block;
-  height: 48px;
+  height: 52px;
   width: auto;
+  max-width: 168px;
   object-fit: contain;
+  flex-shrink: 0;
 }
 
 .logo-wrap {
@@ -186,6 +188,7 @@ main {
   font-family: var(--font-heading);
   font-size: 1.25rem;
   color: var(--color-primary);
+  white-space: nowrap;
 }
 
 .logo-constituency {
